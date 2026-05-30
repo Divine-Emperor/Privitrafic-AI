@@ -502,7 +502,50 @@ footer { padding: 24px 32px; text-align: center; font-size: 0.75rem; color: var(
     display: none !important;
 }
 
-/* Force cleaner layouts during HTML-to-PDF conversion to bypass html2canvas grid limits */
+/* Force dark solid backgrounds to keep white text visible */
+.html2pdf__container,
+.is-printing,
+#pdf-content-wrapper.is-printing {
+    background-color: #070b14 !important;
+    background-image: none !important;
+    color: #f8fafc !important;
+}
+
+/* Switch transparent cards to high-contrast opaque dark backgrounds */
+.html2pdf__container .summary-card,
+.is-printing .summary-card,
+.html2pdf__container .graph-card,
+.is-printing .graph-card,
+.html2pdf__container .zone-card,
+.is-printing .zone-card,
+.html2pdf__container .bns-stat,
+.is-printing .bns-stat,
+.html2pdf__container .control-panel,
+.is-printing .control-panel,
+.html2pdf__container .log-container,
+.is-printing .log-container,
+.html2pdf__container .ids-console,
+.is-printing .ids-console {
+    background: #0f172a !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: none !important;
+    color: #f8fafc !important;
+}
+
+/* Fix text colors inside cards */
+.is-printing .summary-value {
+    color: #f8fafc !important;
+    -webkit-text-fill-color: #f8fafc !important;
+}
+
+/* Auto-expand IDS logs to show all records instead of clipping with scrollbars */
+.html2pdf__container .ids-logs,
+.is-printing .ids-logs {
+    height: auto !important;
+    overflow-y: visible !important;
+}
+
+/* Switch Grid systems to clean Flex columns */
 .html2pdf__container #summary-bar,
 .is-printing #summary-bar {
     display: flex !important;
@@ -529,5 +572,12 @@ footer { padding: 24px 32px; text-align: center; font-size: 0.75rem; color: var(
     display: flex !important;
     flex-wrap: wrap !important;
     gap: 16px !important;
+}
+
+.html2pdf__container .zone-layout,
+.is-printing .zone-layout {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 24px !important;
 }
 
