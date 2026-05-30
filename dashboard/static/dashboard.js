@@ -7,6 +7,7 @@ const REFRESH_INTERVAL = 3000; // 3 seconds
 const MAX_HISTORY = 20;
 
 let tabsInitialized = false;
+let lastFetchedData = null;
 
 // Chart history arrays
 const chartData = {
@@ -101,6 +102,7 @@ async function fetchData() {
     try {
         const res = await fetch('/api/data');
         const data = await res.json();
+        lastFetchedData = data;
         renderDashboard(data);
     } catch (err) {
         console.error('Fetch error:', err);
@@ -451,29 +453,155 @@ function updateCharts(data, timeStr, primaryZone) {
 }
 
 function downloadPDF() {
-    const element = document.getElementById('pdf-content-wrapper');
+    if (!lastFetchedData) {
+        showToast('No data available to generate report yet', 'danger');
+        return;
+    }
+    
+    // Create a hidden wrapper container in the normal DOM flow
+    const printWrapper = document.createElement('div');
+    printWrapper.style.height = '0';
+    printWrapper.style.overflow = 'hidden';
+    printWrapper.style.position = 'relative';
+    
+    // Create temporary print container
+    const reportContainer = document.createElement('div');
+    reportContainer.style.width = '1100px';
+    reportContainer.style.backgroundColor = '#070b14';
+    reportContainer.style.color = '#f8fafc';
+    reportContainer.style.padding = '40px';
+    reportContainer.style.fontFamily = "'Inter', sans-serif";
+    
+    const timeStr = new Date().toLocaleString('en-IN');
+    const g = lastFetchedData.global_summary;
+    const pBudget = lastFetchedData.privacy_budget_spent !== undefined ? lastFetchedData.privacy_budget_spent.toFixed(2) : '--';
+    
+    // Check if any zone is compromised
+    let isCompromised = false;
+    let compromiseReason = "SECURE";
+    for (const z of Object.values(lastFetchedData.zones)) {
+        if (z.security_status && z.security_status.is_compromised) {
+            isCompromised = true;
+            compromiseReason = z.security_status.attack_type || "Anomaly Detected";
+            break;
+        }
+    }
+    
+    const integrityColor = isCompromised ? '#ef4444' : '#10b981';
+    const integrityText = isCompromised ? `ALERT: ${compromiseReason}` : 'SECURE';
+    
+    // Build logs
+    const idsLogs = document.getElementById('ids-logs');
+    const logsHTML = idsLogs ? idsLogs.innerHTML : '<div class="log-entry info">[SYSTEM] SOC Monitoring Active</div>';
+
+    // Build zone lines
+    let zonesHTML = '';
+    for (const [name, z] of Object.entries(lastFetchedData.zones)) {
+        const statusColor = z.is_emergency ? '#ef4444' : (z.accident_risk > 50 ? '#f59e0b' : '#10b981');
+        const idsStatusColor = z.security_status && z.security_status.is_compromised ? '#ef4444' : '#10b981';
+        const idsStatusText = z.security_status && z.security_status.is_compromised ? 'COMPROMISED' : 'SECURE';
+        
+        zonesHTML += `
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+                <td style="padding: 12px 8px; font-weight: bold; color: #fff;">${name}</td>
+                <td style="padding: 12px 8px; color: ${statusColor}; font-weight: 600;">${z.congestion_level}</td>
+                <td style="padding: 12px 8px; color: #10b981; font-weight: 600;">${z.safety_score.toFixed(1)}%</td>
+                <td style="padding: 12px 8px; color: #3b82f6;">${z.privacy_risk.toFixed(1)}%</td>
+                <td style="padding: 12px 8px; color: #f59e0b;">${z.accident_risk.toFixed(1)}%</td>
+                <td style="padding: 12px 8px; color: ${idsStatusColor}; font-weight: bold;">${idsStatusText}</td>
+                <td style="padding: 12px 8px; color: #cbd5e1; font-size: 11px;">${z.recommendations.join(', ')}</td>
+            </tr>
+        `;
+    }
+
+    reportContainer.innerHTML = `
+        <!-- Report Header -->
+        <div style="border-bottom: 3px solid #8b5cf6; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 style="font-family:'Outfit'; font-size: 32px; margin: 0; color: #8b5cf6; display: flex; align-items: center; gap: 10px;">🛡️ PriviTraffic SOC</h1>
+                <p style="margin: 5px 0 0 0; color: #cbd5e1; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase;">Intelligent Transport System Audit Report</p>
+            </div>
+            <div style="text-align: right;">
+                <p style="margin: 0; font-size: 12px; color: #64748b; font-family: monospace;">Generated: <strong>${timeStr}</strong></p>
+                <p style="margin: 5px 0 0 0; font-size: 12px; color: #64748b; font-family: monospace;">Global Threat Level: <strong style="color: ${integrityColor};">${integrityText}</strong></p>
+            </div>
+        </div>
+
+        <!-- Overview Grid -->
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 35px;">
+            <div style="background: #0f172a; padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); text-align: center;">
+                <div style="font-size: 11px; color: #64748b; text-transform: uppercase; margin-bottom: 8px; font-weight: 700; letter-spacing: 0.5px;">Avg Safety Score</div>
+                <div style="font-size: 28px; font-weight: 800; color: #10b981;">${g.avg_safety.toFixed(1)}%</div>
+            </div>
+            <div style="background: #0f172a; padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); text-align: center;">
+                <div style="font-size: 11px; color: #64748b; text-transform: uppercase; margin-bottom: 8px; font-weight: 700; letter-spacing: 0.5px;">Avg Privacy Risk</div>
+                <div style="font-size: 28px; font-weight: 800; color: #ef4444;">${g.avg_privacy_risk.toFixed(1)}%</div>
+            </div>
+            <div style="background: #0f172a; padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); text-align: center;">
+                <div style="font-size: 11px; color: #64748b; text-transform: uppercase; margin-bottom: 8px; font-weight: 700; letter-spacing: 0.5px;">Privacy Budget Spent</div>
+                <div style="font-size: 28px; font-weight: 800; color: #3b82f6;">${pBudget} ε</div>
+            </div>
+            <div style="background: #0f172a; padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); text-align: center;">
+                <div style="font-size: 11px; color: #64748b; text-transform: uppercase; margin-bottom: 8px; font-weight: 700; letter-spacing: 0.5px;">Alert Zones</div>
+                <div style="font-size: 28px; font-weight: 800; color: ${g.emergency_zones > 0 ? '#ef4444' : '#10b981'};">${g.emergency_zones} / ${g.total_zones}</div>
+            </div>
+        </div>
+
+        <!-- Section 1: Detailed Zone Table -->
+        <h2 style="font-family:'Outfit'; font-size: 20px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px; margin-bottom: 15px; color: #06b6d4; font-weight: 700;">📍 Zone Analytics Summary</h2>
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 35px; text-align: left; font-size: 13px;">
+            <thead>
+                <tr style="border-bottom: 2px solid rgba(255,255,255,0.15); color: #64748b; font-size: 11px; text-transform: uppercase; font-weight: 700;">
+                    <th style="padding: 10px 8px;">Zone</th>
+                    <th style="padding: 10px 8px;">Congestion</th>
+                    <th style="padding: 10px 8px;">BNS Safety</th>
+                    <th style="padding: 10px 8px;">Privacy Risk</th>
+                    <th style="padding: 10px 8px;">Accident Risk</th>
+                    <th style="padding: 10px 8px;">IDS Status</th>
+                    <th style="padding: 10px 8px;">Recommendations</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${zonesHTML}
+            </tbody>
+        </table>
+
+        <!-- Section 2: Threat Log Stream -->
+        <h2 style="font-family:'Outfit'; font-size: 20px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px; margin-bottom: 15px; color: #ef4444; font-weight: 700;">🛡️ Intrusion Detection System Logs</h2>
+        <div style="background: #000000; border: 1px solid #ef4444; border-radius: 12px; padding: 20px; font-family: monospace; font-size: 11px; line-height: 1.8; color: #fca5a5; max-height: 200px; overflow-y: hidden;">
+            ${logsHTML}
+        </div>
+        
+        <!-- Footer -->
+        <div style="margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 20px; text-align: center; font-size: 11px; color: #64748b;">
+            PriviTraffic SOC • Secure Intelligent Transportation System Report • Confidential
+        </div>
+    `;
+
+    printWrapper.appendChild(reportContainer);
+    document.body.appendChild(printWrapper);
+
     const opt = {
         margin:       0.5,
-        filename:     'PriviTraffic_BNS_Report.pdf',
+        filename:     'PriviTraffic_SOC_Audit_Report.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#070b14' },
-        jsPDF:        { unit: 'in', format: 'a3', orientation: 'portrait' },
-        pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
     };
+    
     const btn = document.getElementById('download-pdf-btn');
     const origText = btn.innerHTML;
     btn.innerHTML = '<span>⏳</span> Generating...';
     
-    // Add is-printing class to format layout cleanly
-    element.classList.add('is-printing');
-    
-    html2pdf().set(opt).from(element).save().then(() => {
+    html2pdf().set(opt).from(reportContainer).save().then(() => {
         btn.innerHTML = origText;
-        element.classList.remove('is-printing');
+        document.body.removeChild(printWrapper);
+        showToast('Security audit report downloaded successfully', 'success');
     }).catch(err => {
         console.error('PDF generation error:', err);
         btn.innerHTML = origText;
-        element.classList.remove('is-printing');
+        document.body.removeChild(printWrapper);
+        showToast('Failed to generate report', 'danger');
     });
 }
 
