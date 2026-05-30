@@ -112,13 +112,3 @@ Fuses the deep learning forecasts with first-order logic safety rules. If the se
 Fires up the Flask daemon, running on port `5001`. It acts as the gateway for `/` (Dashboard UI) and the sanitized `/api/data` endpoints, housing the `DifferentialPrivacyGuard` initialization.
 
 ---
-
-## 📝 Research & Mathematical Base
-To explore the core mathematical theories (Variational Inference, Monte Carlo Dropout Uncertainty, and the **Temporal Structure Consistency (TSC)** constraint) that drive the project, open the Jupyter research notebook:
-```bash
-# Verify jupyter is installed in your local kernel
-pip install jupyter
-# Start the server
-jupyter notebook BNS_ICMLA_v6(1)(4).ipynb
-```
-You can select the `traffic` environment python interpreter as your running kernel.
