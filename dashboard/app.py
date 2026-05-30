@@ -43,5 +43,5 @@ def api_zone(zone_name):
 
 if __name__ == "__main__":
     print("🚦🔐 PriviTraffic AI Dashboard")
-    print("   http://localhost:5001")
-    app.run(host="0.0.0.0", port=5001, debug=True)
+    print("   http://localhost:5005")
+    app.run(host="0.0.0.0", port=5005, debug=True)

@@ -457,14 +457,23 @@ function downloadPDF() {
         filename:     'PriviTraffic_BNS_Report.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#070b14' },
-        jsPDF:        { unit: 'in', format: 'a3', orientation: 'portrait' }
+        jsPDF:        { unit: 'in', format: 'a3', orientation: 'portrait' },
+        pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
     };
     const btn = document.getElementById('download-pdf-btn');
     const origText = btn.innerHTML;
     btn.innerHTML = '<span>⏳</span> Generating...';
     
+    // Add is-printing class to format layout cleanly
+    element.classList.add('is-printing');
+    
     html2pdf().set(opt).from(element).save().then(() => {
         btn.innerHTML = origText;
+        element.classList.remove('is-printing');
+    }).catch(err => {
+        console.error('PDF generation error:', err);
+        btn.innerHTML = origText;
+        element.classList.remove('is-printing');
     });
 }
 

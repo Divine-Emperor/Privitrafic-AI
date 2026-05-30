@@ -489,3 +489,45 @@ footer { padding: 24px 32px; text-align: center; font-size: 0.75rem; color: var(
 /* ── ANIMATIONS ────────────────────────── */
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* ── PRINT & PDF STYLES ────────────────── */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+}
+
+.html2pdf__container .no-print,
+.is-printing .no-print {
+    display: none !important;
+}
+
+/* Force cleaner layouts during HTML-to-PDF conversion to bypass html2canvas grid limits */
+.html2pdf__container #summary-bar,
+.is-printing #summary-bar {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 16px !important;
+}
+
+.html2pdf__container #graphs-panel,
+.is-printing #graphs-panel {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 20px !important;
+}
+
+.html2pdf__container #zones-container,
+.is-printing #zones-container {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 20px !important;
+}
+
+.html2pdf__container .bns-metrics-grid,
+.is-printing .bns-metrics-grid {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 16px !important;
+}
+
