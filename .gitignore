@@ -1,0 +1,10 @@
+# Virtual Environments
+.venv/
+traffic/
+
+# Python Cache
+__pycache__/
+*.pyc
+
+# Local system files
+.DS_Store
