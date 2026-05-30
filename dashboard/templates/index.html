@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PriviTraffic AI — Smart Traffic Intelligence</title>
+    <meta name="description" content="Privacy-Preserving Smart Traffic Intelligence using Bayesian Neuro-Symbolic Learning">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    
+    <!-- Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <div id="pdf-content-wrapper">
+        <!-- ═══════════ HEADER ═══════════ -->
+        <header id="main-header">
+            <div class="header-left">
+                <div class="logo">
+                    <span class="logo-icon">🛡️</span>
+                    <span class="logo-text">Privi<span class="accent">Traffic</span> SOC</span>
+                </div>
+                <span class="tagline">Secure Intelligent Transportation System</span>
+            </div>
+            <div class="header-right">
+                <button id="download-pdf-btn" class="btn-primary">
+                    <span>📄</span> Download BNS Report
+                </button>
+                <div class="live-indicator" id="live-dot">
+                    <span class="dot"></span> LIVE
+                </div>
+                <div class="timestamp" id="timestamp">--:--:--</div>
+            </div>
+        </header>
+
+        <!-- ═══════════ TABS NAVIGATION ═══════════ -->
+        <nav class="tabs-nav" id="tabs-nav">
+            <button class="tab-btn active" data-target="global-tab">🌐 Global Overview</button>
+            <div id="dynamic-tabs" style="display: contents;"></div>
+        </nav>
+
+        <!-- ═══════════ GLOBAL TAB ═══════════ -->
+        <div id="global-tab" class="tab-pane active">
+            <!-- BNS Core Highlight -->
+            <section id="bns-core-panel">
+                <div class="bns-core-header">
+                    <h2>🧠 Bayesian Neuro-Symbolic (BNS) Core</h2>
+                    <p>Real-time fusion of Neural Uncertainty (BNN) and Symbolic Logic (Rules)</p>
+                </div>
+                <div class="bns-metrics-grid" id="bns-metrics-grid">
+                    <!-- BNS metrics injected here -->
+                </div>
+            </section>
+
+            <!-- Global Summary Bar -->
+            <section id="summary-bar">
+                <div class="summary-card" id="summary-safety">
+                    <div class="summary-label">🛡️ Overall Safety</div>
+                    <div class="summary-value" id="avg-safety">--</div>
+                    <div class="summary-unit">%</div>
+                </div>
+                <div class="summary-card" id="summary-privacy">
+                    <div class="summary-label">🔐 Privacy Risk</div>
+                    <div class="summary-value" id="avg-privacy">--</div>
+                    <div class="summary-unit">%</div>
+                </div>
+                <div class="summary-card" id="summary-zones">
+                    <div class="summary-label">📍 Active Zones</div>
+                    <div class="summary-value" id="total-zones">--</div>
+                    <div class="summary-unit">zones</div>
+                </div>
+                <div class="summary-card emergency" id="summary-emergency">
+                    <div class="summary-label">🚨 Emergencies</div>
+                    <div class="summary-value" id="emergency-count">--</div>
+                    <div class="summary-unit">alerts</div>
+                </div>
+                <div class="summary-card" id="summary-privacy-budget">
+                    <div class="summary-label">🔒 Privacy Budget (ε)</div>
+                    <div class="summary-value" id="privacy-budget">--</div>
+                    <div class="summary-unit">spent</div>
+                </div>
+            </section>
+
+            <!-- IDS Alert Console -->
+            <section id="ids-console-panel" class="ids-console">
+                <div class="ids-header">
+                    <h3>🛡️ IDS Alert Console (Live Network & Sensor Logs)</h3>
+                </div>
+                <div class="ids-logs" id="ids-logs">
+                    <div class="log-entry info">[SYSTEM] SOC Monitoring Initialized...</div>
+                </div>
+            </section>
+
+            <!-- Graphs Section -->
+            <section id="graphs-panel">
+                <div class="graph-card">
+                    <h3>📈 Risk vs Privacy (BNS Output)</h3>
+                    <div class="chart-container">
+                        <canvas id="mainChart"></canvas>
+                    </div>
+                </div>
+                <div class="graph-card">
+                    <h3>🎲 BNN Uncertainty & Confidence</h3>
+                    <div class="chart-container">
+                        <canvas id="bnnChart"></canvas>
+                    </div>
+                </div>
+                <div class="graph-card">
+                    <h3>🚨 Isolation Forest Anomaly Score</h3>
+                    <div class="chart-container">
+                        <canvas id="anomalyChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Main Grid (Zones Overview) -->
+            <main id="dashboard-grid">
+                <h2 class="section-title">📍 Zone Intelligence Overview</h2>
+                <div id="zones-container"></div>
+            </main>
+        </div>
+
+        <!-- ═══════════ ZONE TABS CONTAINER ═══════════ -->
+        <div id="zone-tabs-container">
+            <!-- JS injects zone specific tabs here -->
+        </div>
+
+    </div> <!-- End PDF wrapper -->
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container"></div>
+
+    <script src="/static/dashboard.js"></script>
+</body>
+</html>
