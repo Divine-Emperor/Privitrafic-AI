@@ -18,11 +18,9 @@ This project was built for the **Cybersecurity AI Hackathon**, demonstrating how
 ## 📂 GitHub Repository Structure
 
 ```
-HAckathon1/
-├── BNS_ICMLA_v6(1)(4).ipynb      # IEEE ICMLA BNS Research Notebook
-├── requirements.txt              # Project package dependencies
-├── README.md                     # Project documentation (this file)
-└── privitrafic_ai/               # Core application source
+
+
+    privitrafic_ai/               # Core application source
     ├── traffic/                  # Pre-configured Python virtual environment
     ├── config/                   # Configuration values and threshold limits
     │   └── __init__.py           
